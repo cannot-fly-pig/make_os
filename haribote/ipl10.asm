@@ -4,7 +4,7 @@ CYLS equ 10
 
 	jmp entry
 	db 0x90
-	db "HELLOIPL"
+	db "HARIBOTE"
 	dw 512
 	db 1
 	dw 1
@@ -19,7 +19,7 @@ CYLS equ 10
 	dd 2880
 	db 0,0,0x29
 	dd 0xffffffff
-	db "HELLO-OS   "
+	db "HARIBOTEOS   "
 	db "FAT12   "
 	resb 18
 
@@ -29,7 +29,6 @@ entry: ; レジスタ初期化
 	mov ss, ax
 	mov sp, 0x7c00
 	mov ds, ax
-	mov es, ax
 
 ; ディスクを読む
 	
@@ -41,13 +40,14 @@ entry: ; レジスタ初期化
 
 readloop:
 	mov si, 0 ; カウンタ
+
 retry:
 	mov ah, 0x02 ; ディスク読み込み
 	mov al, 1 ; 1セクタだけ
 	mov bx, 0
 	mov dl, 0x00 ; Aドライブ
 	int 0x13 ; ディスクbios
-	jnc fin
+	jnc next
 	add si, 1
 	cmp si, 5
 	jae error
@@ -71,6 +71,8 @@ next:
 	cmp ch, CYLS
 	jb readloop
 
+	mov     [0x0ff0], ch    ; iplがどこまで読んだのかをメモ
+	jmp     0xc200
 	
 
 fin:
@@ -96,7 +98,7 @@ msg:
 	db 0x0a
 	db 0
 
-	resb	0x1fe-($-$$)		; 0x7dfeまでを0x00で埋める命令
+	resb	0x7dfe - 0x7c00 -($-$$)		; 0x7dfeまでを0x00で埋める命令
 	db		0x55, 0xaa
 
 jmp 0xc200

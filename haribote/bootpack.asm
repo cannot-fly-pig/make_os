@@ -1,3 +1,4 @@
+[SECTION .text]
 	GLOBAL	_HariMain
 _HariMain:
 	PUSH	EBP
