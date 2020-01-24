@@ -1,31 +1,31 @@
-TOOLPATH = ../z_tools/
-MAKE     = $(TOOLPATH)make.exe -r
-NASK     = $(TOOLPATH)nask.exe
+TOOLPATH = ../../../../z_tools/
+MAKE     = make
+NASK     = nasm
 EDIMG    = $(TOOLPATH)edimg.exe
 IMGTOL   = $(TOOLPATH)imgtol.com
-COPY     = copy
-DEL      = del
+COPY     = cp
+DEL      = rm
 
-# ƒfƒtƒHƒ‹ƒg“®ì
+# ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå‹•ä½œ
 
 default :
 	$(MAKE) img
 
-# ƒtƒ@ƒCƒ‹¶¬‹K‘¥
+# ãƒ•ã‚¡ã‚¤ãƒ«ç”Ÿæˆè¦å‰‡
 
-ipl10.bin : ipl10.nas Makefile
-	$(NASK) ipl10.nas ipl10.bin ipl10.lst
+ipl.bin : ipl10.nas Makefile
+	$(NASK) ipl10.nas -o ipl.bin
 
 haribote.sys : haribote.nas Makefile
-	$(NASK) haribote.nas haribote.sys haribote.lst
+	$(NASK) haribote.nas -o haribote.sys
 
-haribote.img : ipl10.bin haribote.sys Makefile
-	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
-		wbinimg src:ipl10.bin len:512 from:0 to:0 \
+haribote.img : ipl.bin haribote.sys Makefile
+	$(EDIMG)   imgin:../../../../z_tools/fdimg0at.tek \
+		wbinimg src:ipl.bin len:512 from:0 to:0 \
 		copy from:haribote.sys to:@: \
 		imgout:haribote.img
 
-# ƒRƒ}ƒ“ƒh
+# ã‚³ãƒãƒ³ãƒ‰
 
 img :
 	$(MAKE) haribote.img
@@ -40,8 +40,8 @@ install :
 	$(IMGTOL) w a: haribote.img
 
 clean :
-	-$(DEL) ipl10.bin
-	-$(DEL) ipl10.lst
+	-$(DEL) ipl.bin
+	-$(DEL) ipl.lst
 	-$(DEL) haribote.sys
 	-$(DEL) haribote.lst
 
