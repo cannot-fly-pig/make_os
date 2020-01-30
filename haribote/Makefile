@@ -1,28 +1,32 @@
 default:
-	make img
+	make run && make clean
 
-ipl10.bin : ipl10.asm Makefile
-	nasm ipl10.asm -o ipl10.bin -l ipl10.lst
+%.bin : %*.asm 
+	nasm $*.asm -o $*.bin -l $*.lst
 
-asmhead.bin : asmhead.asm Makefile
-	nasm asmhead.asm -o asmhead.bin -l asmhead.lst
+nasmfunc.obj : nasmfunc.asm 
+	nasm -g -f elf nasmfunc.asm -o nasmfunc.obj
 
-nasmfunc.o : nasmfunc.asm Makefile
-	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
+convHankakuTxt.bin : convHankakuTxt.c 
+	gcc convHankakuTxt.c -o convHankakuTxt.bin
 
-convHankakuTxt : convHankakuTxt.c Makefile
-	gcc convHankakuTxt.c -o convHankakuTxt
+hankaku.c : hankaku.txt convHankakuTxt.bin 
+	./convHankakuTxt.bin
 
-hankaku.c : hankaku.txt convHankakuTxt Makefile
-	./convHankakuTxt
+bootpack.hrb : bootpack.c har.ld nasmfunc.obj hankaku.c mysprintf.c dsctbl.c graphic.c
+	gcc -fno-pic -march=i486 -m32 -nostdlib -T har.ld -g nasmfunc.obj \
+		bootpack.c \
+		dsctbl.c \
+		graphic.c \
+		hankaku.c \
+		mysprintf.c \
+		int.c \
+		-o bootpack.hrb
 
-bootpack.hrb : bootpack.c har.ld nasmfunc.o hankaku.c mysprintf.c Makefile       # Cファイルをリンカスクリプトを用いてコンパイル
-	gcc -fno-pic -march=i486 -m32 -nostdlib -T har.ld -g bootpack.c nasmfunc.o hankaku.c mysprintf.c -o bootpack.hrb
-
-haribote.sys : asmhead.bin bootpack.hrb Makefile
+haribote.sys : asmhead.bin bootpack.hrb 
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
-haribote.img : ipl10.bin haribote.sys Makefile
+haribote.img : ipl10.bin haribote.sys 
 	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
 	mcopy haribote.sys -i haribote.img ::
 
@@ -41,4 +45,4 @@ debug :
 	qemu-system-i386 -fda haribote.img -gdb tcp::10000 -S
 
 clean :
-	rm *.lst *.bin *.sys *.img *.hrb
+	rm *.lst *.bin *.sys *.img *.hrb *.obj

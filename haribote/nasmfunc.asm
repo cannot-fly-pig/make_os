@@ -4,6 +4,8 @@ section .text
 	global io_out8, io_out16, io_out32
 	global io_load_eflags, io_store_eflags
 	global load_gdtr, load_idtr
+	extern inthandler21, inthandler27, inthandler2c
+	global asm_inthandler21, asm_inthandler27, asm_inthandler2c
 
 
 io_hlt:	; void io_hlt(void);
@@ -80,3 +82,51 @@ load_idtr:		; void load_idtr(int limit, int addr);
 		mov		[esp+6],ax
 		lidt	[esp+6]
 		ret
+
+asm_inthandler21:
+		PUSH	ES
+		PUSH	DS
+		PUSHAD
+		MOV		EAX,ESP
+		PUSH	EAX
+		MOV		AX,SS
+		MOV		DS,AX
+		MOV		ES,AX
+		CALL	inthandler21
+		POP		EAX
+		POPAD
+		POP		DS
+		POP		ES
+		IRETD
+
+asm_inthandler27:
+		PUSH	ES
+		PUSH	DS
+		PUSHAD
+		MOV		EAX,ESP
+		PUSH	EAX
+		MOV		AX,SS
+		MOV		DS,AX
+		MOV		ES,AX
+		CALL	inthandler27
+		POP		EAX
+		POPAD
+		POP		DS
+		POP		ES
+		IRETD
+
+asm_inthandler2c:
+		push	es
+		push	ds
+		pushad
+		mov		eax,esp
+		push	eax
+		mov		ax,ss
+		mov		ds,ax
+		mov		es,ax
+		call	inthandler2c
+		pop		eax
+		popad
+		pop		ds
+		pop		es
+		iretd
