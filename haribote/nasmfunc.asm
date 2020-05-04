@@ -6,6 +6,7 @@ section .text
 	global load_gdtr, load_idtr
 	extern inthandler21, inthandler27, inthandler2c
 	global asm_inthandler21, asm_inthandler27, asm_inthandler2c
+	global load_cr0, store_cr0
 
 
 io_hlt:	; void io_hlt(void);
@@ -130,3 +131,12 @@ asm_inthandler2c:
 		pop		ds
 		pop		es
 		iretd
+
+load_cr0:
+		mov eax, cr0
+		ret
+
+store_cr0:
+		mov eax, [esp+4]
+		mov cr0, eax
+		ret

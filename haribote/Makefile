@@ -13,8 +13,10 @@ convHankakuTxt.bin : convHankakuTxt.c
 hankaku.c : hankaku.txt convHankakuTxt.bin 
 	./convHankakuTxt.bin
 
-bootpack.hrb : bootpack.c har.ld nasmfunc.obj hankaku.c mysprintf.c dsctbl.c graphic.c fifo.c
+bootpack.hrb : bootpack.c har.ld nasmfunc.obj hankaku.c mysprintf.c dsctbl.c graphic.c fifo.c mouse.c keyboard.c
 	gcc -fno-pic -march=i486 -m32 -nostdlib -T har.ld -g nasmfunc.obj \
+		mouse.c \
+		keyboard.c \
 		fifo.c \
 		bootpack.c \
 		dsctbl.c \
